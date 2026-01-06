@@ -138,6 +138,26 @@ const UPSTREAM_API_ERRORS = [
  * @param {boolean=} args.renderOptions.show_repo_link Whether to show repo link or not.
  * @returns {string} The SVG markup.
  */
+/**
+ * Sanitize a CSS color value coming from user input.
+ * Allows only hex colors (#RGB or #RRGGBB) and simple keyword colors (letters and hyphens).
+ *
+ * @param {string | undefined} color
+ * @returns {string | undefined}
+ */
+const sanitizeColor = (color) => {
+  if (typeof color !== "string") {
+    return undefined;
+  }
+  const trimmed = color.trim();
+  const isHex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(trimmed);
+  const isKeyword = /^[a-zA-Z-]+$/.test(trimmed);
+  if (isHex || isKeyword) {
+    return trimmed;
+  }
+  return undefined;
+};
+
 const renderError = ({
   message,
   secondaryMessage = "",
@@ -154,11 +174,11 @@ const renderError = ({
 
   // returns theme based colors with proper overrides and defaults
   const { titleColor, textColor, bgColor, borderColor } = getCardColors({
-    title_color,
-    text_color,
+    title_color: sanitizeColor(title_color),
+    text_color: sanitizeColor(text_color),
     icon_color: "",
-    bg_color,
-    border_color,
+    bg_color: sanitizeColor(bg_color),
+    border_color: sanitizeColor(border_color),
     ring_color: "",
     theme,
   });
